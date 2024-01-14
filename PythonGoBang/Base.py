@@ -1,11 +1,18 @@
 import enum
-
+import collections
 import numpy as np
 from enum import Enum
 '''
     表示我们下的是几子棋
 '''
 NUM_WIN = 5
+
+'''
+    命名元组
+    
+'''
+
+Point = collections.namedtuple("Point",["row","col"])
 
 '''
 棋子颜色类
@@ -19,14 +26,13 @@ class Pieces(Enum):
 '''
     棋盘点类 已经替换为命名元组
 '''
-
-class Point:
-    def __init__(self, row, col):
-        self.row = row
-        self.col = col
-
-    def getPoint(self):
-        print("("+str(self.row)+","+str(self.col)+")")
+# class Point:
+#     def __init__(self, row, col):
+#         self.row = row
+#         self.col = col
+#
+#     def getPoint(self):
+#         print("("+str(self.row)+","+str(self.col)+")")
 
 
 
@@ -109,8 +115,8 @@ class Board:
 
     def applyMove(self, point, player):
         self._grid[point.row][point.col] = player.value
-        del self.legalMove[point]
-        print(len(self.legalMove))
+        # del self.legalMove[point]
+        # print(len(self.legalMove))
 
     def show(self):
         print("   ",end="")
@@ -168,7 +174,7 @@ class Move:
 
     # @classmethod
     def getPointDiscription(self):
-        return self.point.getPoint()
+        return "("+str(self.point.row)+","+str(self.point.col)+")"
 
     def getPoint(self):
         return self.point
