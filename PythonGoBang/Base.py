@@ -1,5 +1,7 @@
 import enum
 import collections
+import random
+
 import numpy as np
 from enum import Enum
 '''
@@ -68,15 +70,18 @@ class Board:
         for i in range(0,self.rows):
             for j in range(0,self.cols):
                 # 由于不可变类、与可变类存在 这里不能用Point类 考虑用元组
-                # TODO 是否将Point类用元组替代
                 dic[Point(i,j)] = 0
         return dic
 
-
+    def getEmptyPointNum(self):
+        return len(self.legalMove)
 
     def randomMove(self):
 
-        return
+        # point = random.sample(self.legalMove.keys(), 1)
+        point = random.choice(list(self.legalMove.keys()))
+
+        return point
 
 
     def getGrid(self):
@@ -115,7 +120,7 @@ class Board:
 
     def applyMove(self, point, player):
         self._grid[point.row][point.col] = player.value
-        # del self.legalMove[point]
+        del self.legalMove[point]
         # print(len(self.legalMove))
 
     def show(self):
@@ -129,9 +134,9 @@ class Board:
                 if self._grid[i][j] == 0:
                     print("*",end="  ")
                 elif self._grid[i][j] == 1:
-                    print("o",end="  ")
+                    print("\033[34mo\033[0m",end="  ")
                 elif self._grid[i][j] == -1:
-                    print("x",end="  ")
+                    print("\033[31mx\033[0m",end="  ")
             print()
 
 
@@ -174,7 +179,7 @@ class Move:
 
     # @classmethod
     def getPointDiscription(self):
-        return "("+str(self.point.row)+","+str(self.point.col)+")"
+        print("("+str(self.point.row)+","+str(self.point.col)+")")
 
     def getPoint(self):
         return self.point
@@ -259,6 +264,10 @@ class GameStatus:
 
         return False
 
+    #平局在胜局的基础上判断，所以，子满了就是平局
+    def isTie(self):
+        return self.board.getEmptyPointNum() == 0
+
     def setMove(self,move):
         self.move = move
 
@@ -266,19 +275,27 @@ class GameStatus:
     # 游戏是否结束
     # TODO 平局的逻辑也要加上
     def isOver(self):
-        return self.isWin()
+        if self.isWin():
+            return "WIN"
+        if self.isTie():
+            return "TIE"
+
+
+
 
     # 走子
     def applyMove(self, point, player):
         self.board.applyMove(point,player)
         self.show()
-        if self.isOver():
+        if self.isOver() != None:
             print('========')
             print("游戏结束")
-            print(str(player)+"获胜")
+            if self.isOver() == "WIN":
+                print("*****   "+str(player) + "获胜")
+            elif self.isOver() == "TIE":
+                print("*****   平局   *****")
             print('========')
             return "OVER"
-
 
     #打印方法
     def show(self):

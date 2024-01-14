@@ -7,14 +7,19 @@ class AI:
         self.gameStatus=gameStatus
 
     def moveStrategy(self):
-        self.gameStatus.show()
+        # self.gameStatus.show()
 
-        for i in range(0,self.gameStatus.board.rows):
-            for j in range(0, self.gameStatus.board.cols):
-                point = Point(i,j)
-                if self.gameStatus.board.isLegalMove(point):
-                    self.gameStatus.setMove(Move(point))
-                    return point
+        point = self.gameStatus.board.randomMove()
+        self.gameStatus.setMove(Move(point))
+
+        return point
+
+        # for i in range(0,self.gameStatus.board.rows):
+        #     for j in range(0, self.gameStatus.board.cols):
+        #         point = Point(i,j)
+        #         if self.gameStatus.board.isLegalMove(point):
+        #             self.gameStatus.setMove(Move(point))
+        #             return point
 
 
 
