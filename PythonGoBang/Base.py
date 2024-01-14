@@ -24,7 +24,7 @@ class Pieces(Enum):
     WHITE = 1
 
 '''
-    棋盘点类 已经替换为命名元组  
+    棋盘点类 我们已经替换为命名元组  
 '''
 # class Point:
 #     def __init__(self, row, col):
