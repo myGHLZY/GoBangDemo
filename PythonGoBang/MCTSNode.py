@@ -37,6 +37,7 @@ def selection(node):
 def rollout(node):
     print()
     print()
+    print()
 
 
 
