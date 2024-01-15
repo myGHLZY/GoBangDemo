@@ -1,9 +1,11 @@
-import enum
 import collections
 import random
-
+import copy
 import numpy as np
 from enum import Enum
+import enum
+import time
+
 '''
     表示我们下的是几子棋
 '''
@@ -65,6 +67,11 @@ class Board:
     '''
         Board类的一些方法
     '''
+
+    def reset(self):
+        self._grid = [[0 for _ in range(len(sublist))] for sublist in self._grid]
+        self.legalMove = self.initLegalMove()
+
     def initLegalMove(self):
         dic = {}
         for i in range(0,self.rows):
@@ -200,7 +207,38 @@ class GameStatus:
         self.player = player
         self.move = move
 
+    def reset(self):
+        self.board.reset()
+        self.move = None
+        self.player = Player.BLACK
 
+    #专用于蒙特卡罗的随机下法
+    def randomMoveMCTS(self,rollout_num):
+        #当前方从此节点进行模拟，胜利的局数
+        num_win = 0
+        # 复制一份游戏状态
+        # 额外复制一份randomMove
+        gameStatus = copy.copy(self)
+        start_player = gameStatus.player
+        start = time.time()
+        for i in range(0,rollout_num):
+            while True:
+                status = self.applyMove(self.board.randomMove(), start_player)
+                if status == "OVER":
+                    num_win+=1
+                    break
+                gameStatus.player = gameStatus.player.other
+                status = self.applyMove(self.board.randomMove(), start_player.other)
+                if status == "OVER":
+                    break
+                gameStatus.player = gameStatus.player.other
+            gameStatus.reset()
+        end = time.time()
+        print("***此次模拟结束***")
+        print("模拟开始方是",str(start_player)," 胜局",str(num_win),"\n总模拟局数",str(rollout_num))
+        print("胜率是："+str(num_win)+"/"+str(rollout_num)+" = ",num_win/rollout_num)
+        print("总耗时：",end - start)
+        return num_win
 
 
     '''
@@ -230,14 +268,16 @@ class GameStatus:
                     return True
             else:
                 num_wim=0
-        # 斜率小于0的斜线
+
+
+        # 斜率小于0的斜线(考虑棋盘不是一个正方形)
         num_wim = 0
         if x >= y:
-            i = x - y
-            j = 0
-        else:
-            j = y - x
             i = 0
+            j = x - y
+        else:
+            i = y - x
+            j = 0
         while i < self.board.getBoardCols() and j < self.board.getBoardRows():
             if self.board.getGrid()[i][j] == self.player.value:
                 num_wim += 1
@@ -250,8 +290,12 @@ class GameStatus:
 
         # 斜率大于0的斜线
         num_wim = 0
-        i = 0
-        j = x + y
+        if y <= self.board.getBoardCols() - 1 - x:
+            i = 0
+            j = x + y
+        else:
+            i = y + x - self.board.getBoardCols() + 1
+            j = self.board.getBoardCols() - 1
         while i < self.board.getBoardCols() and j < self.board.getBoardRows():
             if self.board.getGrid()[i][j] == self.player.value:
                 num_wim += 1
@@ -285,6 +329,7 @@ class GameStatus:
 
     # 走子
     def applyMove(self, point, player):
+        self.setMove(Move(point))
         self.board.applyMove(point,player)
         self.show()
         if self.isOver() != None:

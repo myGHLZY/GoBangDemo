@@ -2,10 +2,19 @@ from AI import AI
 from Base import Pieces,Player,Point,GameStatus,Board
 
 
+def test():
+    # 创建一个棋盘
+    board = Board(10, 8)
+    # 创建游戏状态类
+    gameStatus = GameStatus(board, player=Player.BLACK, move=None)
+
+    gameStatus.randomMoveMCTS(1)
+
+
 def start():
 
     #创建一个棋盘
-    board = Board(5,5)
+    board = Board(10,10)
     #创建游戏状态类
     gameStatus = GameStatus(board,player=Player.BLACK,move=None)
 
@@ -30,3 +39,4 @@ def start():
 
 if __name__ == '__main__':
     start()
+    # test()
